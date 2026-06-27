@@ -274,7 +274,7 @@ public class DrawPanel extends JPanel {
         Map<String, Object> stats = lotteryService.getDrawStatistics(drawResult.getDrawId());
         sb.append("本期参与彩票数：").append(stats.get("totalTickets")).append(" 张\n");
         sb.append("特等奖(7中7)：").append(stats.get("specialPrizeCount")).append(" 注\n");
-        sb.append("一等奖(6中7)：").append(stats.get("firstPrizeCount")).append(" 注\n");
+        sb.append("一等奖(7中6)：").append(stats.get("firstPrizeCount")).append(" 注\n");
         sb.append("派奖总额：¥").append(String.format("%.2f", stats.get("totalPayout"))).append("\n");
 
         if (!winners.isEmpty()) {

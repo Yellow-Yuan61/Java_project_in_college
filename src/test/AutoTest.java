@@ -247,7 +247,7 @@ public class AutoTest {
         System.out.println("  ═════════ 统计结果 ═════════");
         System.out.println("  总彩票数：    " + stats.get("totalTickets") + " 张");
         System.out.println("  特等奖(7中7)：" + stats.get("specialPrizeCount") + " 注");
-        System.out.println("  一等奖(6中7)：" + stats.get("firstPrizeCount") + " 注");
+        System.out.println("  一等奖(7中6)：" + stats.get("firstPrizeCount") + " 注");
         System.out.println("  总中奖注数：  " + winners.size() + " 注");
         System.out.println("  中奖率：      " + String.format("%.4f%%",
                 winners.size() * 100.0 / allTickets.size()));
