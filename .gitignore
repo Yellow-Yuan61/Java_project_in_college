@@ -18,3 +18,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Runtime data
+data/
+
+# JAR file
+*.jar
+
+# Doc (not to be pushed)
+doc/*.md
