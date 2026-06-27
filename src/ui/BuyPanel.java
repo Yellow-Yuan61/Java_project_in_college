@@ -3,6 +3,7 @@ package ui;
 import logic.model.Ticket;
 import logic.model.User;
 import logic.service.LotteryService;
+import logic.service.UserService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +27,7 @@ public class BuyPanel extends JPanel {
     private final User currentUser;
     private final MainFrame mainFrame;
     private final LotteryService lotteryService;
+    private final UserService userService;
 
     private JToggleButton[] ballButtons;
     private JSpinner betCountSpinner;
@@ -43,6 +45,7 @@ public class BuyPanel extends JPanel {
         this.currentUser = currentUser;
         this.mainFrame = mainFrame;
         this.lotteryService = new LotteryService();
+        this.userService = new UserService();
         this.selectedNumbers = new HashSet<>();
         initUI();
     }
@@ -262,6 +265,11 @@ public class BuyPanel extends JPanel {
 
             try {
                 Ticket ticket = lotteryService.buyTicket(currentUser.getUserId(), numbers, betCount);
+                // 从DataStore获取最新余额，同步到currentUser和界面
+                User freshUser = userService.getUserById(currentUser.getUserId());
+                if (freshUser != null) {
+                    currentUser.setBalance(freshUser.getBalance());
+                }
                 mainFrame.refreshBalance(currentUser.getBalance());
                 refreshBalance();
                 infoArea.append("✓ 手动购票成功！\n");
@@ -279,6 +287,11 @@ public class BuyPanel extends JPanel {
             int betCount = (int) betCountSpinner.getValue();
             try {
                 Ticket ticket = lotteryService.buyRandomTicket(currentUser.getUserId(), betCount);
+                // 从DataStore获取最新余额，同步到currentUser和界面
+                User freshUser = userService.getUserById(currentUser.getUserId());
+                if (freshUser != null) {
+                    currentUser.setBalance(freshUser.getBalance());
+                }
                 mainFrame.refreshBalance(currentUser.getBalance());
                 refreshBalance();
                 infoArea.append("✓ 随机购票成功！\n");

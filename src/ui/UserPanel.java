@@ -166,8 +166,14 @@ public class UserPanel extends JPanel {
         return value;
     }
 
-    /** 刷新用户信息显示 */
+    /** 刷新用户信息显示（从DataStore获取最新数据） */
     public void refreshInfo() {
+        // 从DataStore获取最新余额，同步到currentUser
+        User freshUser = userService.getUserById(currentUser.getUserId());
+        if (freshUser != null) {
+            currentUser.setBalance(freshUser.getBalance());
+            currentUser.setPhone(freshUser.getPhone());
+        }
         userIdLabel.setText(currentUser.getUserId());
         usernameLabel.setText(currentUser.getUsername());
         balanceLabel.setText("¥" + String.format("%.2f", currentUser.getBalance()));

@@ -19,6 +19,7 @@ public class MainFrame extends JFrame {
     private DrawPanel drawPanel;
     private HistoryPanel historyPanel;
     private UserPanel userPanel;
+    private JLabel userInfoLabel;
 
     public MainFrame(User user) {
         this.currentUser = user;
@@ -42,7 +43,7 @@ public class MainFrame extends JFrame {
         welcomeLabel.setForeground(Color.WHITE);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
-        JLabel userInfoLabel = new JLabel("用户: " + currentUser.getUsername()
+        userInfoLabel = new JLabel("用户: " + currentUser.getUsername()
                 + " | 余额: ¥" + String.format("%.2f", currentUser.getBalance()));
         userInfoLabel.setFont(new Font("微软雅黑", Font.PLAIN, 13));
         userInfoLabel.setForeground(new Color(255, 255, 200));
@@ -68,11 +69,15 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * 刷新用户余额显示
+     * 刷新用户余额显示（更新内存和顶部标签）
      * @param newBalance 新余额
      */
     public void refreshBalance(double newBalance) {
         currentUser.setBalance(newBalance);
+        if (userInfoLabel != null) {
+            userInfoLabel.setText("用户: " + currentUser.getUsername()
+                    + " | 余额: ¥" + String.format("%.2f", newBalance));
+        }
     }
 
     /**
