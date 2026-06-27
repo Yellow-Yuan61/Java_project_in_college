@@ -181,7 +181,7 @@ public class UserPanel extends JPanel {
     }
 
     /** 刷新中奖记录 */
-    private void refreshWinHistory() {
+    public void refreshWinHistory() {
         List<Ticket> wins = lotteryService.getUserWinHistory(currentUser.getUserId());
         if (wins.isEmpty()) {
             winHistoryArea.setText("暂无中奖记录\n\n继续购买彩票，好运等着您！");

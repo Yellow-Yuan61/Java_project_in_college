@@ -63,6 +63,19 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("历史记录", historyPanel);
         tabbedPane.addTab("个人中心", userPanel);
 
+        // 标签切换监听：自动刷新对应面板数据
+        tabbedPane.addChangeListener(e -> {
+            int idx = tabbedPane.getSelectedIndex();
+            if (idx == 2) {
+                // 切换到"历史记录"标签页
+                historyPanel.refreshAll();
+            } else if (idx == 3) {
+                // 切换到"个人中心"标签页
+                userPanel.refreshInfo();
+                userPanel.refreshWinHistory();
+            }
+        });
+
         // 组装
         add(headerPanel, BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
