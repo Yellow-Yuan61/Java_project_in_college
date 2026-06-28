@@ -177,11 +177,11 @@ public class LotteryService {
                 .filter(t -> t != null && t.isWinner())
                 .collect(Collectors.toList());
 
-        // 将本期彩票关联到开奖期号
+        // 将本期彩票关联到开奖期号（只更新内存，最后统一刷盘）
         for (Ticket ticket : currentDrawTickets) {
             ticket.setDrawId(drawResult.getDrawId());
-            dataStore.saveTicket(ticket);
         }
+        dataStore.flushAllTicketChanges();
 
         // 通知中奖用户
         for (Ticket winner : winners) {

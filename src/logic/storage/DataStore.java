@@ -184,6 +184,13 @@ public class DataStore {
     }
 
     /**
+     * 将所有内存中的彩票数据刷写到文件
+     */
+    public void flushAllTicketChanges() {
+        saveAllTickets();
+    }
+
+    /**
      * 批量保存彩票（用于AutoTest）
      * @param tickets 彩票列表
      */
