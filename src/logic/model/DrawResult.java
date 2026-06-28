@@ -2,6 +2,8 @@ package logic.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 开奖结果实体类，记录每期开奖的中奖号码和开奖时间。
@@ -84,38 +86,63 @@ public class DrawResult implements Serializable {
         return sb.toString();
     }
 
-    // ==================== 序列化 ====================
+    // ==================== 序列化（JSON格式） ====================
 
     /**
-     * 序列化为字符串: drawId|n1,n2,...,n7|drawTime|status
-     * @return 序列化字符串
+     * 序列化为JSON字符串
+     * @return JSON字符串
      */
     public String serialize() {
-        return drawId + "|" + getWinningNumbersString() + "|" + drawTime + "|" + status;
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("drawId", drawId);
+        map.put("winningNumbers", winningNumbers);
+        map.put("drawTime", drawTime);
+        map.put("status", status);
+        return logic.util.JsonUtil.toJson(map);
     }
 
     /**
-     * 从字符串反序列化
-     * @param line 序列化字符串
+     * 从JSON字符串反序列化
+     * @param line JSON字符串
      * @return 开奖结果对象
      */
     public static DrawResult deserialize(String line) {
         try {
-            String[] parts = line.split("\\|");
-            if (parts.length < 4) return null;
+            Map<String, Object> map = logic.util.JsonUtil.parseObject(line);
             DrawResult dr = new DrawResult();
-            dr.drawId = parts[0];
-            String[] numStrs = parts[1].split(",");
-            dr.winningNumbers = new int[numStrs.length];
-            for (int i = 0; i < numStrs.length; i++) {
-                dr.winningNumbers[i] = Integer.parseInt(numStrs[i]);
+            dr.drawId = str(map.get("drawId"));
+            Object numObj = map.get("winningNumbers");
+            if (numObj instanceof int[]) {
+                dr.winningNumbers = (int[]) numObj;
+            } else if (numObj instanceof String) {
+                dr.winningNumbers = logic.util.JsonUtil.parseIntArray((String) numObj);
             }
-            dr.drawTime = Long.parseLong(parts[2]);
-            dr.status = Integer.parseInt(parts[3]);
+            dr.drawTime = toLong(map.get("drawTime"));
+            dr.status = toInt(map.get("status"));
             return dr;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static String str(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
+    private static int toInt(Object obj) {
+        if (obj instanceof Number) return ((Number) obj).intValue();
+        if (obj != null) {
+            try { return Integer.parseInt(obj.toString()); } catch (NumberFormatException ignored) {}
+        }
+        return 0;
+    }
+
+    private static long toLong(Object obj) {
+        if (obj instanceof Number) return ((Number) obj).longValue();
+        if (obj instanceof String) {
+            try { return Long.parseLong((String) obj); } catch (NumberFormatException ignored) {}
+        }
+        return 0L;
     }
 
     @Override

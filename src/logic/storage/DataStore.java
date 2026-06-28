@@ -24,10 +24,10 @@ public class DataStore {
 
     /** 数据目录路径 */
     private static final String DATA_DIR = "data";
-    private static final String USERS_FILE = DATA_DIR + "/users.dat";
-    private static final String TICKETS_FILE = DATA_DIR + "/tickets.dat";
-    private static final String DRAWS_FILE = DATA_DIR + "/draws.dat";
-    private static final String COUNTERS_FILE = DATA_DIR + "/counters.dat";
+    private static final String USERS_FILE = DATA_DIR + "/users.json";
+    private static final String TICKETS_FILE = DATA_DIR + "/tickets.json";
+    private static final String DRAWS_FILE = DATA_DIR + "/draws.json";
+    private static final String COUNTERS_FILE = DATA_DIR + "/counters.json";
 
     /** 内存中的数据缓存 */
     private ConcurrentHashMap<String, User> userMap;

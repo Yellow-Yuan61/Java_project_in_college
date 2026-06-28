@@ -3,6 +3,8 @@ package logic.model;
 import logic.storage.DataStore;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 用户实体类，包含用户id、用户名、密码、账户金额、电话号码等属性。
@@ -108,40 +110,56 @@ public class User implements Serializable {
         this.notificationMessage = notificationMessage;
     }
 
-    // ==================== 序列化 ====================
+    // ==================== 序列化（JSON格式） ====================
 
     /**
-     * 将用户对象序列化为字符串，格式: userId|username|password|balance|phone|hasUnread|message
-     * @return 序列化字符串
+     * 将用户对象序列化为JSON字符串
+     * @return JSON字符串
      */
     public String serialize() {
-        return userId + "|" + username + "|" + password + "|"
-                + balance + "|" + phone + "|"
-                + (hasUnreadNotification ? "1" : "0") + "|"
-                + (notificationMessage == null ? "" : notificationMessage.replace("|", " "));
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("userId", userId);
+        map.put("username", username);
+        map.put("password", password);
+        map.put("balance", balance);
+        map.put("phone", phone);
+        map.put("hasUnread", hasUnreadNotification);
+        map.put("notificationMessage", notificationMessage == null ? "" : notificationMessage);
+        return logic.util.JsonUtil.toJson(map);
     }
 
     /**
-     * 从字符串反序列化为用户对象
-     * @param line 序列化字符串
+     * 从JSON字符串反序列化为用户对象
+     * @param line JSON字符串
      * @return 用户对象，解析失败返回null
      */
     public static User deserialize(String line) {
         try {
-            String[] parts = line.split("\\|");
-            if (parts.length < 7) return null;
+            Map<String, Object> map = logic.util.JsonUtil.parseObject(line);
             User user = new User();
-            user.userId = parts[0];
-            user.username = parts[1];
-            user.password = parts[2];
-            user.balance = Double.parseDouble(parts[3]);
-            user.phone = parts[4];
-            user.hasUnreadNotification = "1".equals(parts[5]);
-            user.notificationMessage = parts.length > 6 ? parts[6] : "";
+            user.userId = str(map.get("userId"));
+            user.username = str(map.get("username"));
+            user.password = str(map.get("password"));
+            user.balance = toDouble(map.get("balance"));
+            user.phone = str(map.get("phone"));
+            user.hasUnreadNotification = Boolean.TRUE.equals(map.get("hasUnread"));
+            user.notificationMessage = str(map.get("notificationMessage"));
             return user;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static String str(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
+    private static double toDouble(Object obj) {
+        if (obj instanceof Number) return ((Number) obj).doubleValue();
+        if (obj != null) {
+            try { return Double.parseDouble(obj.toString()); } catch (NumberFormatException ignored) {}
+        }
+        return 0.0;
     }
 
     @Override

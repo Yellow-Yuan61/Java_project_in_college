@@ -2,6 +2,8 @@ package logic.model;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 彩票实体类，记录用户购买的彩票信息。
@@ -157,48 +159,75 @@ public class Ticket implements Serializable {
         return sb.toString();
     }
 
-    // ==================== 序列化 ====================
+    // ==================== 序列化（JSON格式） ====================
 
     /**
-     * 序列化为字符串，格式: ticketId|userId|drawId|n1,n2,...n7|betCount|isWinner|prizeLevel|matchedCount|prizeAmount|isNotified
-     * @return 序列化字符串
+     * 序列化为JSON字符串
+     * @return JSON字符串
      */
     public String serialize() {
-        return ticketId + "|" + userId + "|" + drawId + "|"
-                + getNumbersString() + "|" + betCount + "|"
-                + (isWinner ? "1" : "0") + "|" + prizeLevel + "|"
-                + matchedCount + "|" + prizeAmount + "|"
-                + (isNotified ? "1" : "0");
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("ticketId", ticketId);
+        map.put("userId", userId);
+        map.put("drawId", drawId == null ? "" : drawId);
+        map.put("numbers", numbers);
+        map.put("betCount", betCount);
+        map.put("isWinner", isWinner);
+        map.put("prizeLevel", prizeLevel);
+        map.put("matchedCount", matchedCount);
+        map.put("prizeAmount", prizeAmount);
+        map.put("isNotified", isNotified);
+        return logic.util.JsonUtil.toJson(map);
     }
 
     /**
-     * 从字符串反序列化
-     * @param line 序列化字符串
+     * 从JSON字符串反序列化
+     * @param line JSON字符串
      * @return 彩票对象
      */
     public static Ticket deserialize(String line) {
         try {
-            String[] parts = line.split("\\|");
-            if (parts.length < 10) return null;
+            Map<String, Object> map = logic.util.JsonUtil.parseObject(line);
             Ticket ticket = new Ticket();
-            ticket.ticketId = parts[0];
-            ticket.userId = parts[1];
-            ticket.drawId = parts[2];
-            String[] numStrs = parts[3].split(",");
-            ticket.numbers = new int[numStrs.length];
-            for (int i = 0; i < numStrs.length; i++) {
-                ticket.numbers[i] = Integer.parseInt(numStrs[i]);
+            ticket.ticketId = str(map.get("ticketId"));
+            ticket.userId = str(map.get("userId"));
+            ticket.drawId = str(map.get("drawId"));
+            Object numObj = map.get("numbers");
+            if (numObj instanceof int[]) {
+                ticket.numbers = (int[]) numObj;
+            } else if (numObj instanceof String) {
+                ticket.numbers = logic.util.JsonUtil.parseIntArray((String) numObj);
             }
-            ticket.betCount = Integer.parseInt(parts[4]);
-            ticket.isWinner = "1".equals(parts[5]);
-            ticket.prizeLevel = Integer.parseInt(parts[6]);
-            ticket.matchedCount = Integer.parseInt(parts[7]);
-            ticket.prizeAmount = Double.parseDouble(parts[8]);
-            ticket.isNotified = "1".equals(parts[9]);
+            ticket.betCount = toInt(map.get("betCount"));
+            ticket.isWinner = Boolean.TRUE.equals(map.get("isWinner"));
+            ticket.prizeLevel = toInt(map.get("prizeLevel"));
+            ticket.matchedCount = toInt(map.get("matchedCount"));
+            ticket.prizeAmount = toDouble(map.get("prizeAmount"));
+            ticket.isNotified = Boolean.TRUE.equals(map.get("isNotified"));
             return ticket;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static String str(Object obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
+    private static int toInt(Object obj) {
+        if (obj instanceof Number) return ((Number) obj).intValue();
+        if (obj != null) {
+            try { return Integer.parseInt(obj.toString()); } catch (NumberFormatException ignored) {}
+        }
+        return 0;
+    }
+
+    private static double toDouble(Object obj) {
+        if (obj instanceof Number) return ((Number) obj).doubleValue();
+        if (obj != null) {
+            try { return Double.parseDouble(obj.toString()); } catch (NumberFormatException ignored) {}
+        }
+        return 0.0;
     }
 
     @Override
